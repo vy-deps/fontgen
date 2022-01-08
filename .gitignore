@@ -1,0 +1,4 @@
+.vscode
+build
+example/**/*.tga
+example/**/*.fnt
