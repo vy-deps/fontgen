@@ -29,6 +29,7 @@ struct TmpFile
 struct GeneralSettings
 {
   std::string characters;
+  std::string prefix_path;
 };
 
 struct FontDefinition
@@ -80,7 +81,7 @@ widthPaddingFactor=0.00
 outWidth=%d
 outHeight=%d
 outBitDepth=32
-fontDescFormat=1
+fontDescFormat=0
 fourChnlPacked=1
 textureFormat=tga
 textureCompression=1
@@ -126,6 +127,32 @@ chars=%s
   std::cout << "tmp config file written: " << path.generic_string() << "\n";
 }
 
+bool replace(std::string& str, const std::string& from, const std::string& to)
+{
+  size_t start_pos = str.find(from);
+  if(start_pos == std::string::npos) return false;
+  str.replace(start_pos, from.length(), to);
+  return true;
+}
+
+void replace_in_file(const std::string& file_path, std::string what, std::string to)
+{
+  std::ifstream     in_file(file_path);
+  std::stringstream ss;
+  std::string       line;
+
+  while(std::getline(in_file, line))
+  {
+    replace(line, what, to);
+    ss << line << '\n';
+  }
+
+  in_file.close();
+
+  std::ofstream out_file(file_path, std::ofstream::out | std::ofstream::trunc);
+  out_file << ss.str();
+}
+
 int main(int argc, char** argv)
 {
   bmfont::Init();
@@ -141,6 +168,7 @@ int main(int argc, char** argv)
   if(auto it = ini.sections.find("@generator"); it != ini.sections.end())
   {
     inipp::get_value(it->second, "characters", general_settings.characters);
+    inipp::get_value(it->second, "prefix_path", general_settings.prefix_path);
   }
   else
   {
@@ -183,6 +211,8 @@ int main(int argc, char** argv)
       std::cerr << "bmfont generation failed!\n";
       return res;
     }
+
+    replace_in_file(out_file, fs::current_path().generic_string(), general_settings.prefix_path);
   }
 
   bmfont::Destroy();
