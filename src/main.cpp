@@ -117,8 +117,6 @@ chars=%s
     abort();
   }
 
-  std::cout << formatted;
-
   std::ofstream stream(path);
   stream << formatted;
   stream.flush();
@@ -127,7 +125,7 @@ chars=%s
   std::cout << "tmp config file written: " << path.generic_string() << "\n";
 }
 
-bool replace(std::string& str, const std::string& from, const std::string& to)
+static bool replace(std::string& str, const std::string& from, const std::string& to)
 {
   size_t start_pos = str.find(from);
   if(start_pos == std::string::npos) return false;
@@ -135,7 +133,7 @@ bool replace(std::string& str, const std::string& from, const std::string& to)
   return true;
 }
 
-void replace_in_file(const std::string& file_path, std::string what, std::string to)
+static void replace_in_file(const std::string& file_path, std::string what, std::string to)
 {
   std::ifstream     in_file(file_path);
   std::stringstream ss;
