@@ -37,7 +37,10 @@ struct FontDefinition
   std::string name;
   std::string file;
   int         size;
-  int         texture_size;
+  int         width;
+  int         height;
+  int         bold;
+  int         italic;
 };
 
 static void write_config_file(const fs::path& path, const GeneralSettings& general_settings, const FontDefinition& font)
@@ -49,12 +52,12 @@ fileVersion=1
 fontName=%s
 fontFile=%s
 charSet=0
-fontSize=%d
+fontSize=-%d
 aa=1
 scaleH=100
 useSmoothing=1
-isBold=0
-isItalic=0
+isBold=%d
+isItalic=%d
 useUnicode=1
 disableBoxChars=1
 outputInvalidCharGlyph=1
@@ -106,9 +109,9 @@ chars=%s
   char formatted[2048] = {0};
 
   int e = sprintf_s(formatted, fmt,
-                    font.name.c_str(),
-                    font.file.c_str(), font.size,
-                    font.texture_size, font.texture_size,
+                    font.name.c_str(), font.file.c_str(),
+                    font.size, font.bold, font.italic,
+                    font.width, font.height,
                     general_settings.characters.c_str());
 
   if(e == -1)
@@ -187,7 +190,10 @@ int main(int argc, char** argv)
     inipp::get_value(section, "name", def.name);
     inipp::get_value(section, "file", def.file);
     inipp::get_value(section, "size", def.size);
-    inipp::get_value(section, "texture_size", def.texture_size);
+    inipp::get_value(section, "bold", def.bold);
+    inipp::get_value(section, "italic", def.italic);
+    inipp::get_value(section, "width", def.width);
+    inipp::get_value(section, "height", def.height);
 
     def.file = (fs::current_path() / def.file).generic_string();
 
